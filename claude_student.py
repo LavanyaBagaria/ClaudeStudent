@@ -43,7 +43,7 @@ def call_claude(prompt: str, max_tokens: int, model: str) -> str:
     content_items = body.get("content", [])
     text_items = [item for item in content_items if item.get("type") == "text"]
     text_blocks = [item.get("text", "") for item in text_items]
-    return "\n".join(block for block in text_blocks if block).strip()
+    return "\n".join(block for block in text_blocks if block)
 
 
 def parse_args() -> argparse.Namespace:
