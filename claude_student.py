@@ -40,7 +40,9 @@ def call_claude(prompt: str, max_tokens: int, model: str) -> str:
         detail = exc.read().decode("utf-8", errors="replace")
         raise RuntimeError(f"Claude API request failed ({exc.code}): {detail}") from exc
 
-    text_blocks = [item.get("text", "") for item in body.get("content", []) if item.get("type") == "text"]
+    content_items = body.get("content", [])
+    text_items = [item for item in content_items if item.get("type") == "text"]
+    text_blocks = [item.get("text", "") for item in text_items]
     return "\n".join(block for block in text_blocks if block).strip()
 
 
@@ -54,6 +56,10 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
+    if args.max_tokens <= 0:
+        print("--max-tokens must be a positive integer.", file=sys.stderr)
+        return 2
+
     try:
         output = call_claude(args.prompt, args.max_tokens, args.model)
     except RuntimeError as exc:
